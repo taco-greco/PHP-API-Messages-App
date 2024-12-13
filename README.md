@@ -32,7 +32,7 @@ CREATE TABLE Messages (
 );
 ```
 ### Créer la table Conversations
-```
+```sql
 CREATE TABLE Conversations (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     Participant_1_ID INT NOT NULL,
