@@ -4,12 +4,12 @@
 ## Database
 
 ### Créer la base de données
-```
+```sql
 CREATE DATABASE chat_application;
 USE chat_application;
 ```
 ### Créer la table Users
-```
+```sql
 CREATE TABLE Users (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     Username VARCHAR(50) NOT NULL UNIQUE,
@@ -19,7 +19,7 @@ CREATE TABLE Users (
 );
 ```
 ### Créer la table Messages
-```
+```sql
 CREATE TABLE Messages (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     Sender_ID INT NOT NULL,
