@@ -5,10 +5,10 @@ namespace src\Model;
 class User
 {
     private ?int $Id = null;
-    private String $Email;
-    private String $Password;
-    private array $Roles;
-
+    private string $Username;
+    private string $Password;
+    private ?string $Created_At = null;
+    private ?string $Last_Online = null;
 
     /**
      * Get the value of Id
@@ -24,32 +24,30 @@ class User
     public function setId(?int $Id): self
     {
         $this->Id = $Id;
-
         return $this;
     }
 
     /**
-     * Get the value of Email
+     * Get the value of Username
      */
-    public function getEmail(): String
+    public function getUsername(): string
     {
-        return $this->Email;
+        return $this->Username;
     }
 
     /**
-     * Set the value of Email
+     * Set the value of Username
      */
-    public function setEmail(String $Email): self
+    public function setUsername(string $Username): self
     {
-        $this->Email = $Email;
-
+        $this->Username = $Username;
         return $this;
     }
 
     /**
      * Get the value of Password
      */
-    public function getPassword(): String
+    public function getPassword(): string
     {
         return $this->Password;
     }
@@ -57,57 +55,70 @@ class User
     /**
      * Set the value of Password
      */
-    public function setPassword(String $Password): self
+    public function setPassword(string $Password): self
     {
         $this->Password = $Password;
-
         return $this;
     }
 
     /**
-     * Get the value of Roles
+     * Get the value of Created_At
      */
-    public function getRoles(): array
+    public function getCreatedAt(): ?string
     {
-        return $this->Roles;
+        return $this->Created_At;
     }
 
     /**
-     * Set the value of Roles
+     * Set the value of Created_At
      */
-    public function setRoles(array $Roles): self
+    public function setCreatedAt(?string $Created_At): self
     {
-        $this->Roles = $Roles;
+        $this->Created_At = $Created_At;
+        return $this;
+    }
 
+    /**
+     * Get the value of Last_Online
+     */
+    public function getLastOnline(): ?string
+    {
+        return $this->Last_Online;
+    }
+
+    /**
+     * Set the value of Last_Online
+     */
+    public function setLastOnline(?string $Last_Online): self
+    {
+        $this->Last_Online = $Last_Online;
         return $this;
     }
 
     public static function SqlAdd(User $user): int
     {
-        $requete = BDD::getInstance()->prepare("INSERT INTO users (Email, Password,
-NomPrenom, Roles) VALUES(:Email, :Password, :NomPrenom, :Roles)");
+        $requete = BDD::getInstance()->prepare("INSERT INTO users (Username, Password) VALUES(:Username, :Password)");
         $requete->execute([
-            "Email" => $user->getEMail(),
-            "Password" => $user->getPassword(),
-            "NomPrenom" => "Olivier Carglass", //Prévoir un champ dans le formulaire pour çaà l'avenir
-            "Roles" => json_encode($user->getRoles())
+            "Username" => $user->getUsername(),
+            "Password" => $user->getPassword()
         ]);
         return BDD::getInstance()->lastInsertId();
     }
 
-    public static function SqlGetByMail(string $mail): ?User
+    public static function SqlGetByMail(string $username): ?User
     {
-        $requete = BDD::getInstance()->prepare("SELECT * FROM users WHERE Email=:mail");
+        $requete = BDD::getInstance()->prepare("SELECT * FROM users WHERE Username=:username");
         $requete->execute([
-            "mail" => $mail
+            "username" => $username
         ]);
         $datas = $requete->fetch(\PDO::FETCH_ASSOC);
         if ($datas != false) {
             $user = new User();
-            $user->setId($datas["Id"])
-                ->setEMail($datas["Email"])
+            $user->setId($datas["ID"])
+                ->setUsername($datas["Username"])
                 ->setPassword($datas["Password"])
-                ->setRoles(json_decode($datas["Roles"]));
+                ->setCreatedAt($datas["Created_At"])
+                ->setLastOnline($datas["Last_Online"]);
             return $user;
         }
         return null;
