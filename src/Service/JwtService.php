@@ -60,7 +60,7 @@ class JwtService
         }
 
         $now = new \DateTimeImmutable();
-        $serverName = "hobbymatch.localhost";
+        $serverName = "192.168.1.15:8000";
         if($token->iss !== $serverName || $token->exp < $now->getTimestamp() || $token->nbf > $now->getTimestamp()){
             return [
                 "status" => "error",
