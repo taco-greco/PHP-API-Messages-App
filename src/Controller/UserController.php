@@ -100,4 +100,24 @@ class UserController extends AbstractController
 
         return json_encode($token);
     }
+
+    public function getUsers()
+    {
+        header("Content-Type: application/json; charset=utf-8");
+
+        if ($_SERVER["REQUEST_METHOD"] != "GET") {
+            header("HTTP/1.1 405 Method Not Allowed");
+            echo json_encode([
+                "code" => 1,
+                "message" => "GET method expected"
+            ]);
+            return;
+        }
+
+        $users = User::SqlGetAll();
+        echo json_encode([
+            "code" => 0,
+            "users" => $users
+        ]);
+    }
 }

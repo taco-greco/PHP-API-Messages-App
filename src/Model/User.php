@@ -95,6 +95,13 @@ class User
         return $this;
     }
 
+    public static function SqlGetAll(): array
+    {
+        $requete = BDD::getInstance()->prepare("SELECT ID, Username FROM users");
+        $requete->execute();
+        return $requete->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
     public static function SqlAdd(User $user): int
     {
         $requete = BDD::getInstance()->prepare("INSERT INTO users (Username, Password) VALUES(:Username, :Password)");
