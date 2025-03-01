@@ -44,4 +44,35 @@ class MessageController
         "message_id" => $id
     ]);
     }
+
+    public function getMessages()
+    {
+        header("Content-Type: application/json; charset=utf-8");
+
+        if ($_SERVER["REQUEST_METHOD"] != "GET") {
+            header("HTTP/1.1 405 Method Not Allowed");
+            echo json_encode([
+                "code" => 1,
+                "message" => "GET method expected"
+            ]);
+            return;
+        }
+
+        if (!isset($_GET['conversation_id'])) {
+            header("HTTP/1.1 400 Bad Request");
+            echo json_encode([
+                "code" => 1,
+                "message" => "Missing conversation_id"
+            ]);
+            return;
+        }
+
+        $conversation_id = $_GET['conversation_id'];
+        $messages = Message::SqlGetByConversationId($conversation_id);
+
+        echo json_encode([
+            "code" => 0,
+            "messages" => $messages
+        ]);
+    }
 }

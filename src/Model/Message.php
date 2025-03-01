@@ -129,4 +129,13 @@ class Message
         ]);
         return BDD::getInstance()->lastInsertId();
     }
+
+    public static function SqlGetByConversationId(int $conversation_id): array
+    {
+        $requete = BDD::getInstance()->prepare("SELECT * FROM messages WHERE (Sender_ID=:user_id OR Receiver_ID=:user_id) ORDER BY timestamp ASC");
+        $requete->execute([
+            "user_id" => $conversation_id
+        ]);
+        return $requete->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }
