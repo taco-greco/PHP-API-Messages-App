@@ -10,26 +10,31 @@ USE chat_application;
 ```
 ### Créer la table Users
 ```sql
-CREATE TABLE Users (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Username VARCHAR(50) NOT NULL UNIQUE,
-    Password VARCHAR(255) NOT NULL,
-    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    Last_Online TIMESTAMP DEFAULT NULL
+CREATE TABLE `users` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `Username` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `Email` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `Password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `Created_At` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `Last_Online` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `Username` (`Username`),
+  UNIQUE KEY `Email` (`Email`)
 );
 ```
 ### Créer la table Messages
 ```sql
-CREATE TABLE Messages (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
-    Sender_ID INT NOT NULL,
-    Receiver_ID INT NOT NULL,
-    Content TEXT NOT NULL,
-    Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    Is_Read BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (Sender_ID) REFERENCES Users(ID) ON DELETE CASCADE,
-    FOREIGN KEY (Receiver_ID) REFERENCES Users(ID) ON DELETE CASCADE
-);
+CREATE TABLE `messages` (
+  `ID` int NOT NULL AUTO_INCREMENT,
+  `Sender_ID` int NOT NULL,
+  `Receiver_ID` int NOT NULL,
+  `Content` text COLLATE utf8mb4_general_ci NOT NULL,
+  `Timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `Is_Read` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  KEY `Sender_ID` (`Sender_ID`),
+  KEY `Receiver_ID` (`Receiver_ID`)
+) 
 ```
 ### Créer la table Conversations
 ```sql
