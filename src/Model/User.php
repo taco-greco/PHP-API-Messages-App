@@ -150,4 +150,13 @@ class User
         }
         return null;
     }
+    public static function SqlGetAllExcluding(int $connectedUserId): array
+    {
+        $requete = BDD::getInstance()->prepare("SELECT ID, Username, Email FROM users WHERE ID != :connectedUserId");
+        $requete->execute([
+            "connectedUserId" => $connectedUserId
+        ]);
+        return $requete->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
 }

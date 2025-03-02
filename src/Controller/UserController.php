@@ -86,7 +86,7 @@ class UserController
         }
     }
 
-    public function getUsers()
+    public function getUsers($connectedUserId)
     {
         header("Content-Type: application/json; charset=utf-8");
 
@@ -99,7 +99,7 @@ class UserController
             return;
         }
 
-        $users = User::SqlGetAll();
+        $users = User::SqlGetAllExcluding($connectedUserId);
         echo json_encode([
             "code" => 0,
             "users" => $users
