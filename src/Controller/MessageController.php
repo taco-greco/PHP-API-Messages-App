@@ -45,7 +45,7 @@ class MessageController
     }
 
 
-    public function getMessages($user1_id = null, $user2_id = null)
+    public function getMessages($user1_id, $user2_id)
 {
     header("Content-Type: application/json; charset=utf-8");
 
