@@ -23,7 +23,7 @@ class UserController
         $data = file_get_contents("php://input");
         $json = json_decode($data);
 
-        if (empty($json) || !isset($json->mail) || !isset($json->password)) {
+        if (empty($json) || !isset($json->username) || !isset($json->email) || !isset($json->password)) {
             header("HTTP/1.1 400 Bad Request");
             echo json_encode([
                 "code" => 1,
@@ -33,9 +33,9 @@ class UserController
         }
 
         $user = new User();
-        $hashpass = password_hash($json->password, PASSWORD_BCRYPT, ["cost" => 12]);
-        $user->setUsername($json->mail)
-            ->setPassword($hashpass);
+        $user->setUsername($json->username)
+             ->setEmail($json->email)
+             ->setPassword(password_hash($json->password, PASSWORD_BCRYPT));
         $id = User::SqlAdd($user);
 
         echo json_encode([
@@ -51,57 +51,42 @@ class UserController
 
         if ($_SERVER["REQUEST_METHOD"] != "POST") {
             header("HTTP/1.1 405 Method Not Allowed");
-            return json_encode([
+            echo json_encode([
                 "code" => 1,
-                "Message" => "Post Attendu"
+                "message" => "POST method expected"
             ]);
+            return;
         }
-        // Récuperation du body en String
+
         $data = file_get_contents("php://input");
-        //Conversion du String en JSON
         $json = json_decode($data);
 
-        if (empty($json)) {
-            header("HTTP/1.1 403 Forbidden");
-            return json_encode([
+        if (empty($json) || !isset($json->email) || !isset($json->password)) {
+            header("HTTP/1.1 400 Bad Request");
+            echo json_encode([
                 "code" => 1,
-                "Message" => "Il faut des données"
+                "message" => "Missing email or password"
             ]);
+            return;
         }
 
-        if (!isset($json->mail) || !isset($json->password)) {
-            header("HTTP/1.1 403 Forbidden");
-            return json_encode([
+        $user = User::SqlGetByMail($json->email);
+        if ($user && password_verify($json->password, $user->getPassword())) {
+            echo json_encode([
+                "code" => 0,
+                "message" => "Login successful",
+                "user_id" => $user->getId()
+            ]);
+        } else {
+            header("HTTP/1.1 401 Unauthorized");
+            echo json_encode([
                 "code" => 1,
-                "Message" => "Il manque le mail ou le password"
+                "message" => "Invalid email or password"
             ]);
         }
-        // Récupérer les info de l'utilisateur par son mail
-        $user = User::SqlGetByMail($json->mail);
-        if ($user == null) {
-            header("HTTP/1.1 403 Forbidden");
-            return json_encode([
-                "code" => 1,
-                "Message" => "User inexistant"
-            ]);
-        }
-        // Comparer le mot de passe avec celui hashé en bdd
-        if (!password_verify($json->password, $user->getPassword())) {
-            header("HTTP/1.1 403 Forbidden");
-            return json_encode([
-                "code" => 1,
-                "Message" => "Mot de passe invalid"
-            ]);
-        }
-        // Return JWT
-        $token = JwtService::createToken([
-            "username" => $user->getUsername(),
-        ]);
-
-        return json_encode($token);
     }
 
-    public function getUsers()
+    public function getUsers($connectedUserId)
     {
         header("Content-Type: application/json; charset=utf-8");
 
@@ -114,7 +99,7 @@ class UserController
             return;
         }
 
-        $users = User::SqlGetAll();
+        $users = User::SqlGetAllExcluding($connectedUserId);
         echo json_encode([
             "code" => 0,
             "users" => $users

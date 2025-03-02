@@ -6,6 +6,7 @@ class User
 {
     private ?int $Id = null;
     private string $Username;
+    private string $Email;
     private string $Password;
     private ?string $Created_At = null;
     private ?string $Last_Online = null;
@@ -41,6 +42,23 @@ class User
     public function setUsername(string $Username): self
     {
         $this->Username = $Username;
+        return $this;
+    }
+
+    /**
+     * Get the value of Email
+     */
+    public function getEmail(): string
+    {
+        return $this->Email;
+    }
+
+    /**
+     * Set the value of Email
+     */
+    public function setEmail(string $Email): self
+    {
+        $this->Email = $Email;
         return $this;
     }
 
@@ -97,32 +115,34 @@ class User
 
     public static function SqlGetAll(): array
     {
-        $requete = BDD::getInstance()->prepare("SELECT ID, Username FROM users");
+        $requete = BDD::getInstance()->prepare("SELECT ID, Username, Email FROM users");
         $requete->execute();
         return $requete->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public static function SqlAdd(User $user): int
     {
-        $requete = BDD::getInstance()->prepare("INSERT INTO users (Username, Password) VALUES(:Username, :Password)");
+        $requete = BDD::getInstance()->prepare("INSERT INTO users (Username, Email, Password) VALUES(:Username, :Email, :Password)");
         $requete->execute([
             "Username" => $user->getUsername(),
+            "Email" => $user->getEmail(),
             "Password" => $user->getPassword()
         ]);
         return BDD::getInstance()->lastInsertId();
     }
 
-    public static function SqlGetByMail(string $username): ?User
+    public static function SqlGetByMail(string $email): ?User
     {
-        $requete = BDD::getInstance()->prepare("SELECT * FROM users WHERE Username=:username");
+        $requete = BDD::getInstance()->prepare("SELECT * FROM users WHERE Email=:email");
         $requete->execute([
-            "username" => $username
+            "email" => $email
         ]);
         $datas = $requete->fetch(\PDO::FETCH_ASSOC);
         if ($datas != false) {
             $user = new User();
             $user->setId($datas["ID"])
                 ->setUsername($datas["Username"])
+                ->setEmail($datas["Email"])
                 ->setPassword($datas["Password"])
                 ->setCreatedAt($datas["Created_At"])
                 ->setLastOnline($datas["Last_Online"]);
@@ -130,4 +150,13 @@ class User
         }
         return null;
     }
+    public static function SqlGetAllExcluding(int $connectedUserId): array
+    {
+        $requete = BDD::getInstance()->prepare("SELECT ID, Username, Email FROM users WHERE ID != :connectedUserId");
+        $requete->execute([
+            "connectedUserId" => $connectedUserId
+        ]);
+        return $requete->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
 }
