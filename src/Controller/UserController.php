@@ -5,7 +5,7 @@ namespace src\Controller;
 use src\Model\User;
 use src\Service\JwtService;
 
-class UserController extends AbstractController
+class UserController
 {
     public function register()
     {
